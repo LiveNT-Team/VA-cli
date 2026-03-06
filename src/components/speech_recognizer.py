@@ -20,6 +20,9 @@ class SpeechRecognitionResult:
         super().__init__()
         self._text = text
 
+    def __str__(self):
+        return self.text
+
     @property
     def text(self):
         """The text property."""

@@ -6,7 +6,8 @@ from core.exceptions import InvalidDefaultConfigPath, InvalidOverrideConfigPath
 
 DEFAULT_CONFIG_FILE_CONTENT = """
 [voice-assistant]
-commands-database-path = .local/voice-assistant/commands.db
+keywords-sequence-minimal-ratio = 0.9
+commands-list-path = .local/voice-assistant/commands.db
 activation-volume = -30
 vosk-model-path = .local/voice-assistant/vosk-model-ru-0.42
 samplerate = 48000
@@ -99,8 +100,8 @@ class AppConfig:
     # region Properties
 
     @property
-    def commands_database_path(self) -> str:
-        return self._parser.get("voice-assistant", "commands-database-path")
+    def commands_list_path(self) -> str:
+        return self._parser.get("voice-assistant", "commands-list-path")
 
     @property
     def activation_volume(self) -> int:
@@ -125,6 +126,12 @@ class AppConfig:
     @property
     def device(self) -> int:
         return int(self._parser.get("voice-assistant", "device"))
+
+    @property
+    def keywords_sequence_minimal_ratio(self):
+        return int(
+            self._parser.get("voice-assistant", "keywords-sequence-minimal-ratio")
+        )
 
     # endregion
 

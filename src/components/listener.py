@@ -51,7 +51,7 @@ class InputStream:
     def __enter__(self):
         self.start_listening()
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc, tb):
         self.stop_listening()
 
     def stop_listening(self):
