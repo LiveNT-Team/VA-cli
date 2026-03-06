@@ -40,7 +40,10 @@ class SpeechRecognizer:
 
     def _load_model(self, path: str) -> vosk.Model:
         if os.path.exists(path) and os.path.isdir(path):
-            return vosk.Model(config.vosk_model_path)
+            logger.debug(f"Loading vosk model from {path}")
+            model = vosk.Model(config.vosk_model_path)
+            logger.debug(f"Successfully loaded vosk model from {path}")
+            return model
 
         raise InvalidVoskModelPath()
 
@@ -52,12 +55,14 @@ class SpeechRecognizer:
             Audio array in float32
         :return SpeechRecognitionResult:
 
-        To get text, use text key
+        To get text, use string key
 
         >>> result = recognize_speech(...)
         >>> result["text"]
         <text>
         """
+        logger.debug("Recognizing speech")
+        # Converting in int16
         audio_int16 = (audio_float32 * 32767).astype(numpy.int16)
         wav_buffer = io.BytesIO()
         with wave.Wave_write(wav_buffer) as wav:
