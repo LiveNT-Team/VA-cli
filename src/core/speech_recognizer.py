@@ -6,7 +6,7 @@ import vosk
 import os
 import numpy
 import logging
-from core.exceptions import FailedToLoadVoskModel
+from core.exceptions import InvalidVoskModelPath
 
 from core.config import config
 
@@ -33,7 +33,7 @@ class SpeechRecognizer:
         if os.path.exists(path) and os.path.isdir(path):
             return vosk.Model(config.vosk_model_path)
 
-        raise FailedToLoadVoskModel()
+        raise InvalidVoskModelPath()
 
     def recognize_speech(self, audio_float32: numpy.ndarray) -> SpeechRecognitionResult:
         """
