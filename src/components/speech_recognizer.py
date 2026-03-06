@@ -1,4 +1,3 @@
-import typing
 import io
 import json
 import wave
@@ -6,9 +5,9 @@ import vosk
 import os
 import numpy
 import logging
-from core.exceptions import InvalidVoskModelPath
 
-from core.config import config
+from ..core.exceptions import InvalidVoskModelPath
+from ..core.config import config
 
 
 logger = logging.getLogger()

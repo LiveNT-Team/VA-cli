@@ -3,7 +3,8 @@ import typing
 import numpy
 import logging
 
-from core.config import config
+from ..core.config import config
+from ..core.utils import get_dbfs_volume
 
 logger = logging.getLogger()
 
@@ -25,7 +26,7 @@ class InputStream:
         self._is_listening = True
 
         def callback(audio: numpy.ndarray, frames, time, status):
-            volume = InputStream.get_dbfs_volume(audio)
+            volume = get_dbfs_volume(audio)
             logger.debug(f"Input volume: {volume}")
             if volume > config.activation_volume:
                 self._audio = numpy.vstack([self._audio, audio])
