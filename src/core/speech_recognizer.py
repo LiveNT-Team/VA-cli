@@ -14,8 +14,17 @@ from core.config import config
 logger = logging.getLogger()
 
 
-class SpeechRecognitionResult(typing.TypedDict):
-    text: typing.ReadOnly[str]
+class SpeechRecognitionResult:
+    """Type for speech recognition result"""
+
+    def __init__(self, *, text: str, **kwargs):
+        super().__init__()
+        self._text = text
+
+    @property
+    def text(self):
+        """The text property."""
+        return self._text
 
 
 class SpeechRecognizer:
@@ -69,7 +78,8 @@ class SpeechRecognizer:
                 rec.AcceptWaveform(data)
                 logger.debug(rec.PartialResult())
 
-            return json.loads(rec.FinalResult())
+            result = json.loads(rec.FinalResult())
+            return SpeechRecognitionResult(**result)
 
 
 __all__ = ("SpeechRecognizer",)
