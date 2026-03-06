@@ -8,7 +8,7 @@ from core.config import config
 logger = logging.getLogger()
 
 
-class Listener:
+class InputStream:
     def __init__(
         self,
         callback: typing.Callable[[numpy.ndarray]],
@@ -25,7 +25,7 @@ class Listener:
         self._is_listening = True
 
         def callback(audio: numpy.ndarray, frames, time, status):
-            volume = Listener.get_dbfs_volume(audio)
+            volume = InputStream.get_dbfs_volume(audio)
             logger.debug(f"Input volume: {volume}")
             if volume > config.activation_volume:
                 self._audio = numpy.vstack([self._audio, audio])
@@ -47,6 +47,12 @@ class Listener:
             while self._is_listening:
                 pass
 
+    def __enter__(self):
+        self.start_listening()
+
+    def __exit__(self):
+        self.stop_listening()
+
     def stop_listening(self):
         self._is_listening = False
         logger.debug("Stopped listening")
@@ -57,4 +63,4 @@ class Listener:
         return 20 * numpy.log10(rms) if rms > 0 else float("-inf")
 
 
-__all__ = ("Listener",)
+__all__ = ("InputStream",)
