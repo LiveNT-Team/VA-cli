@@ -3,8 +3,8 @@ import typing
 import numpy
 import logging
 
-from ..core.config import config
-from ..core.utils import get_dbfs_volume
+from core.config import config
+from core.utils import get_dbfs_volume
 
 logger = logging.getLogger()
 

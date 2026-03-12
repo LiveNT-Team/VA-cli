@@ -128,8 +128,8 @@ class AppConfig:
         return int(self._parser.get("voice-assistant", "device"))
 
     @property
-    def keywords_sequence_minimal_ratio(self):
-        return int(
+    def keywords_sequence_minimal_ratio(self) -> float:
+        return float(
             self._parser.get("voice-assistant", "keywords-sequence-minimal-ratio")
         )
 

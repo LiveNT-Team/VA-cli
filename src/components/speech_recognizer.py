@@ -6,8 +6,8 @@ import os
 import numpy
 import logging
 
-from ..core.exceptions import InvalidVoskModelPath
-from ..core.config import config
+from core.exceptions import InvalidVoskModelPath
+from core.config import config
 
 
 logger = logging.getLogger()
@@ -83,10 +83,10 @@ class SpeechRecognizer:
                     break
 
                 rec.AcceptWaveform(data)
-                logger.debug(rec.PartialResult())
 
             result = json.loads(rec.FinalResult())
-            return SpeechRecognitionResult(**result)
+            logger.debug(f"Recognized text: {result["text"]}")
+            return SpeechRecognitionResult(text=result["text"])
 
 
 __all__ = ("SpeechRecognizer",)
