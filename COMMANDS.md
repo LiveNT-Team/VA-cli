@@ -9,6 +9,7 @@ Adds a new voice command
 - `-n` `--name ""`
 - `-d` `--description ""`
 - `-sh` `--shell false`
+- `-e` `--exec`
 - `-ph` `--phrase`
 - `-cfg` `--config`
 
@@ -23,11 +24,12 @@ Updates the voice command
 - `-d` `--description` New description
 - `-sh` `--shell` New shell value
 - `-ph` `--phrase` New phrase
+- `-e` `--exec` New script
 - `-cfg` `--config`
 
-## `va-cli remove`
+## `va-cli delete`
 
-Removes the voice command
+Deletes the voice command
 
 **Params:**
 

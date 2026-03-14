@@ -1,0 +1,2 @@
+class InvalidVoskModelPath(Exception):
+    pass
