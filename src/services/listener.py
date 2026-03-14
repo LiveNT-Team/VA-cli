@@ -23,7 +23,7 @@ class Listener:
         self._callback = callback
         self._is_listening = False
 
-    def start_listening(self):
+    async def start_listening(self):
         loop = asyncio.get_event_loop()
         self._is_listening = True
 
@@ -47,21 +47,19 @@ class Listener:
                     (0, self._config.channels), dtype=numpy.float32
                 )
 
-        async def inner():
-            with sounddevice.InputStream(
-                samplerate=self._config.samplerate,
-                blocksize=self._config.samplerate * self._config.lull_duration_sec,
-                device=None if self._config.use_default_device else self._config.device,
-                channels=self._config.channels,
-                callback=lambda *args: callback(*args, loop=loop),
-            ):
-                logger.debug("Listening...")
-                while self._is_listening and os.path.exists("active.flag"):
-                    sleep(1)
+        with sounddevice.InputStream(
+            samplerate=self._config.samplerate,
+            blocksize=self._config.samplerate * self._config.lull_duration_sec,
+            device=None if self._config.use_default_device else self._config.device,
+            channels=self._config.channels,
+            callback=lambda *args: callback(*args, loop=loop),
+        ):
+            logger.debug("Listening...")
+            while self._is_listening and os.path.exists("active.flag"):
+                await asyncio.sleep(1)
+            self.stop_listening()
 
-        asyncio.run_coroutine_threadsafe(inner(), loop)
-
-    async def stop_listening(self):
+    def stop_listening(self):
         self._is_listening = False
         logger.debug("Stopped listening")
 

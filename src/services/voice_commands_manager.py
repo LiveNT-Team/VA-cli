@@ -68,7 +68,7 @@ class VoiceCommandsManager:
         return self._voice_commands.get_all()
 
     def run_voice_command(self, instance: VoiceCommand):
-        logger.debug(f"Running command: {instance}")
+        logger.debug(f"Running command: {repr(instance)}")
         subprocess.run(
             instance.exec,
             shell=instance.shell,

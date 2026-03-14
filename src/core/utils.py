@@ -2,12 +2,10 @@ import random
 import string
 import numpy
 
-from core.utils import VOICE_COMMAND_ID_LENGTH
-
 id_symbols = string.ascii_letters + string.digits
 
 
-def generate_voice_command_id(length: int = VOICE_COMMAND_ID_LENGTH) -> str:
+def generate_voice_command_id(length: int = 10) -> str:
     id = ""
     while length > 0:
         id += str(random.choice(id_symbols))

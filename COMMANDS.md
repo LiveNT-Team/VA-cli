@@ -64,6 +64,7 @@ Prints list of commands
 - `-p` `--page` (номер страницы)
 - `-cfg` `--config`
 - `-r` `--raw` false (if true, prints raw json data)
+- `--per-page`
 
 ## `va-cli activate`
 

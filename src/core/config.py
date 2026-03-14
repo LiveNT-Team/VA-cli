@@ -21,15 +21,15 @@ class Config:
         self.use_default_device = self._config_parser.getboolean(
             "voice", "use_default_device"
         )
-        self.channels = self._config_parser.get("voice", "channels")
-        self.samplerate = self._config_parser.get("voice", "samplerate")
+        self.channels = self._config_parser.getint("voice", "channels")
+        self.samplerate = self._config_parser.getint("voice", "samplerate")
 
         self.vosk_model_path = self._config_parser.get("vosk", "model_path")
 
         self.voice_commands_list_filename = self._config_parser.get(
             "assistant", "voice_commands_list_filename"
         )
-        self.minimal_sequence_ratio = self._config_parser.get(
+        self.minimal_sequence_ratio = self._config_parser.getfloat(
             "assistant", "minimal_sequence_ratio"
         )
 

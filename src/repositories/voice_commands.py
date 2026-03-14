@@ -17,10 +17,12 @@ class VoiceCommands(IVoiceCommands):
     def _read_commands_list_file(self) -> list[dict]:
         if os.path.exists(self._config.voice_commands_list_filename):
             with open(self._config.voice_commands_list_filename, "rb") as file:
-                return orjson.loads(file)
+                return orjson.loads(file.read())
 
         else:
-            open(self._config.voice_commands_list_filename, "wb").close()
+            with open(self._config.voice_commands_list_filename, "wb") as file:
+                file.write(orjson.dumps([]))
+
             return []  # Default value
 
     def _write_commands_list_file(self):
@@ -41,7 +43,8 @@ class VoiceCommands(IVoiceCommands):
                 best_match = command
                 max_sequence_ratio = ratio
 
-        return VoiceCommand(**best_match)
+        if best_match:
+            return VoiceCommand(**best_match)
 
     def delete(self, id):
         for command, index in enumerate(self._commands_list):
@@ -67,16 +70,17 @@ class VoiceCommands(IVoiceCommands):
     def update(
         self, id, name=None, description=None, exec=None, phrase=None, shell=None
     ):
-        for command, index in enumerate(self._commands_list):
+        for index, command in enumerate(self._commands_list):
             if command["id"] == id:
                 self._commands_list[index] = {
                     "id": id,
-                    "name": name | command["name"],
-                    "description": description | command["description"],
-                    "exec": exec | command["exec"],
-                    "phrase": phrase | command["phrase"],
-                    "shell": shell | command["shell"],
+                    "name": name or command["name"],
+                    "description": description or command["description"],
+                    "exec": exec or command["exec"],
+                    "phrase": phrase or command["phrase"],
+                    "shell": shell if shell is not None else command["shell"],
                 }
+                self._write_commands_list_file()
                 return True
 
         return False

@@ -1,4 +1,6 @@
+import asyncio
 import os
+from logging import getLogger, basicConfig
 from typing import Annotated
 from typer import Typer, Option, BadParameter
 from rich.console import Console
@@ -13,6 +15,8 @@ from repositories.voice_commands import VoiceCommands
 CONFIG_PATH = "test.ini"
 app = Typer()
 console = Console()
+logger = getLogger(__name__)
+basicConfig(level=10)
 
 
 @app.command()
@@ -21,9 +25,10 @@ def new(
     description: Annotated[str, Option("--description", "-d")],
     phrase: Annotated[str, Option("--phrase", "-ph")],
     exec: Annotated[str, Option("--exec", "-e")],
-    shell: Annotated[bool, Option("--shell", "-sh")] = False,
+    shell: Annotated[int | None, Option("--shell", "-sh")] = 0,
     config_path: Annotated[str, Option("--config", "-cfg")] = CONFIG_PATH,
 ):
+    shell = None if shell is None else bool(shell)
     config = Config(config_path)
     voice_commands_manager = VoiceCommandsManager(
         voice_commands=VoiceCommands(config=config)
@@ -40,14 +45,15 @@ def new(
 
 @app.command()
 def update(
-    id: str,
+    id: Annotated[str, Option("--id")],
     name: Annotated[str | None, Option("--name", "-n")] = None,
     description: Annotated[str | None, Option("--description", "-d")] = None,
     phrase: Annotated[str | None, Option("--phrase", "-ph")] = None,
     exec: Annotated[str | None, Option("--exec", "-e")] = None,
-    shell: Annotated[bool | None, Option("--shell", "-sh")] = None,
+    shell: Annotated[int | None, Option("--shell", "-sh")] = None,
     config_path: Annotated[str, Option("--config", "-cfg")] = CONFIG_PATH,
 ):
+    shell = None if shell is None else bool(shell)
     config = Config(config_path)
     voice_commands_manager = VoiceCommandsManager(
         voice_commands=VoiceCommands(config=config)
@@ -104,22 +110,16 @@ def find(
     if not voice_command:
         return console.print("[red]Command was not found[/]")
 
-    console.print(
-        f"Name: {voice_command.name}"
-        f"Description: {voice_command.description}"
-        f"Shell: {voice_command.shell}"
-        f"Exec: {voice_command.exec}"
-        f"Phrase: {voice_command.phrase}"
-    )
+    console.print(str(voice_command))
 
 
 @app.command()
 def list(
     page_number: Annotated[int, Option("--page", "-p")],
     config_path: Annotated[str, Option("--config", "-cfg")] = CONFIG_PATH,
+    commands_per_page: Annotated[int, Option("--per-page", "-pp")] = 10,
     is_raw: Annotated[bool, Option("--raw", "-r", is_flag=True)] = False,
 ):
-    commands_per_page = 10
     page_number = abs(page_number)
     page_index = page_number - 1
     config = Config(config_path)
@@ -127,44 +127,46 @@ def list(
         voice_commands=VoiceCommands(config=config)
     )
     if voice_commands_list := voice_commands_manager.get_voice_commands_list():
-        for voice_command in voice_commands_list[
-            page_index
-            * commands_per_page : min(
-                max(0, page_index * commands_per_page + commands_per_page),
-                len(voice_commands_list) - 1,
-            )
-        ]:
+        for number, voice_command in enumerate(
+            voice_commands_list[
+                page_index
+                * commands_per_page : min(
+                    max(0, page_index * commands_per_page + commands_per_page),
+                    len(voice_commands_list),
+                )
+            ],
+            start=page_index * commands_per_page + 1,
+        ):
             if is_raw:
                 print(asdict(voice_command))
             else:
-                console.print(
-                    f"Name: {voice_command.name}"
-                    f"Description: {voice_command.description}"
-                    f"Shell: {voice_command.shell}"
-                    f"Exec: {voice_command.exec}"
-                    f"Phrase: {voice_command.phrase}\n"
-                )
+                console.print(f"{number}.\n{voice_command}")
+        commands_remaining = len(voice_commands_list) - page_number * commands_per_page
+        if commands_remaining > 0:
+            console.print(f"More {commands_remaining} commands...")
+
     else:
         return console.print("[red]No defined commands[/]")
 
 
 @app.command()
 def activate(config_path: Annotated[str, Option("--config", "-cfg")] = CONFIG_PATH):
-    config = Config(config_path)
-    listener = Listener(config, callback=audio_callback)
-    speech_recognizer = SpeechRecognizer(config)
-    voice_commands_manager = VoiceCommandsManager(VoiceCommands(config))
-
     def audio_callback(audio):
         text = speech_recognizer.recognize_speech(audio)
+        print(text)
         if voice_command := voice_commands_manager.get_voice_command_by_phrase(text):
             voice_commands_manager.run_voice_command(voice_command)
         else:
             console.print("[red]Unknown command[/]")
 
+    config = Config(config_path)
+    listener = Listener(config, callback=audio_callback)
+    speech_recognizer = SpeechRecognizer(config)
+    voice_commands_manager = VoiceCommandsManager(VoiceCommands(config))
+
     open("active.flag", "w").close()
     console.print("[green]Started[/]")
-    listener.start_listening()
+    asyncio.run(listener.start_listening())
 
 
 @app.command()
