@@ -12,7 +12,7 @@
     - repositories/
         - commands.py
     - services/
-        - commands_manager.py
+        - voice_commands_manager.py
         - listener.py
         - speech_recognizer.py
 
