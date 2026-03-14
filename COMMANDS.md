@@ -1,6 +1,6 @@
 # Commands
 
-## `va-cli va-cli new`
+## `va-cli new`
 
 Adds a new voice command
 
@@ -10,6 +10,19 @@ Adds a new voice command
 - `-d` `--description ""`
 - `-sh` `--shell false`
 - `-ph` `--phrase`
+- `-cfg` `--config`
+
+## ` va-cli update`
+
+Updates the voice command
+
+**Params:**
+
+- `--id`
+- `-n` `--name` New name
+- `-d` `--description` New description
+- `-sh` `--shell` New shell value
+- `-ph` `--phrase` New phrase
 - `-cfg` `--config`
 
 ## `va-cli remove`
